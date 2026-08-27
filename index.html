@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Çiftlik Krallığı — Tek HTML</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#75b94f;color:#fff;touch-action:none}
+button{font:inherit}
+#game{position:fixed;inset:0;background:#79bd55}
+.top{height:78px;position:fixed;z-index:50;left:0;right:0;top:0;background:linear-gradient(#418f3b,#2e7433);display:flex;align-items:center;gap:10px;padding:7px 12px;box-shadow:0 4px 15px #0005}
+.avatar{width:52px;height:52px;border:3px solid #ffe19b;border-radius:50%;display:grid;place-items:center;background:#ffd078;font-size:29px}
+.profile{display:flex;align-items:center;gap:8px;min-width:150px}.name{font-weight:900}.lvl{font-size:11px;background:#205b2a;border-radius:10px;padding:3px 7px;margin-top:3px}
+.stats{display:flex;gap:6px;flex:1;justify-content:center}.pill{padding:7px 11px;border-radius:17px;background:#235e2b;border:2px solid #7cc75c;font-weight:900;white-space:nowrap;font-size:13px}.pill.g{color:#86ecff}.pill.e{color:#ffe25b}
+.topBtns{display:flex;gap:5px}.iconBtn{width:42px;height:42px;border-radius:12px;border:2px solid #f2c96f;background:#b67632;color:#fff;font-size:21px}
+#viewport{position:fixed;left:0;right:0;top:78px;bottom:63px;overflow:hidden;background:#85c85b}
+#world{position:absolute;width:1900px;height:1200px;left:50%;top:50%;transform:translate(-50%,-50%);background:
+radial-gradient(circle at 20% 25%,#b3dc75 0 18px,transparent 19px),
+radial-gradient(circle at 78% 70%,#9dd168 0 22px,transparent 23px),
+linear-gradient(135deg,#8bca5e,#a7d76e 48%,#78bd52);border:10px solid #72502c;border-radius:35px;box-shadow:inset 0 0 0 4px #b98245;touch-action:none;cursor:grab}
+#world.dragging{cursor:grabbing}
+.path{position:absolute;background:#c89b59;border:4px solid #ad7b43;border-radius:40px;opacity:.95;z-index:1}
+.p1{width:2100px;height:78px;left:-100px;top:530px;transform:rotate(-9deg)}
+.p2{width:76px;height:1300px;left:900px;top:-50px;transform:rotate(7deg)}
+.p3{width:900px;height:58px;left:120px;top:850px;transform:rotate(12deg)}
+.obj{position:absolute;z-index:5;text-align:center;filter:drop-shadow(0 8px 5px #0005);user-select:none}
+.house{left:115px;top:80px;font-size:95px}.barn{left:1490px;top:90px;font-size:86px}.mill{left:1130px;top:90px;font-size:72px}
+.pond{left:1370px;top:790px;font-size:105px}.mine{left:90px;top:880px;font-size:72px}.market{left:1320px;top:490px;font-size:85px}.well{left:430px;top:890px;font-size:65px}
+.tree{font-size:62px}.t1{left:30px;top:250px}.t2{left:330px;top:55px}.t3{left:620px;top:960px}.t4{left:1720px;top:250px}.t5{left:1680px;top:900px}.t6{left:1040px;top:980px}.t7{left:760px;top:70px}.t8{left:1810px;top:590px}
+.label{position:absolute;z-index:8;background:#463323dd;border:2px solid #efc777;padding:7px 11px;border-radius:12px;font-size:12px;font-weight:900;letter-spacing:.3px}.labfarm{left:620px;top:350px}.labmarket{left:1330px;top:610px}.labmine{left:85px;top:975px}.labforest{left:1600px;top:310px}
+#fields{position:absolute;z-index:10;left:600px;top:405px;width:620px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;transform:rotate(-2deg)}
+.plot{height:105px;border:4px solid #673c20;border-radius:12px;background:#8a542d;box-shadow:inset 0 0 0 3px #b8783d;display:grid;place-items:center;font-size:38px;position:relative;cursor:pointer}
+.plot.empty:after{content:"＋";color:#d9a26a;font-size:28px}.plot.ready{background:#a86e31}.plot .tm{position:absolute;left:4px;right:4px;bottom:4px;border-radius:6px;background:#0009;font-size:11px;padding:2px;text-align:center}
+.card{position:absolute;z-index:30;background:#fff;color:#49351e;border-radius:16px;box-shadow:0 10px 25px #0005;border:3px solid #e1b45e}
+#quests{left:12px;top:15px;width:190px;padding:11px}.card h3{margin:0 0 7px;font-size:16px}.small{font-size:12px}.bar{height:8px;background:#ddd;border-radius:10px;overflow:hidden;margin:5px 0}.bar i{display:block;height:100%;background:#58b947}
+#shop{right:12px;top:15px;width:190px;padding:11px}#shop button,.modal button{width:100%;border:0;border-radius:10px;padding:9px;margin:4px 0;background:#d28a35;color:#fff;font-weight:900}
+#bottom{position:fixed;z-index:60;left:0;right:0;bottom:0;height:63px;background:#4a3222;display:flex;justify-content:center;gap:7px;padding:5px;overflow-x:auto}
+.nav{min-width:105px;border:2px solid #e3b666;border-radius:12px;background:#98602e;color:#fff;font-weight:900}.nav.active{background:#d68b35}
+#toast{position:fixed;z-index:100;left:50%;bottom:78px;transform:translate(-50%,20px);opacity:0;background:#276d32;border:2px solid #a6dc75;border-radius:13px;padding:10px 16px;font-weight:900;transition:.2s;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.modal{display:none;position:fixed;z-index:90;inset:0;background:#0008;place-items:center;padding:20px}.modal.show{display:grid}.modalBox{width:min(440px,94vw);max-height:82vh;overflow:auto;background:#fff;color:#49351e;border:4px solid #d7a04a;border-radius:18px;padding:16px;box-shadow:0 20px 50px #0007}.close{float:right;width:34px;height:34px;border:0;border-radius:9px;background:#6b4527;color:#fff;font-weight:900}.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #ddd}
+@media(max-width:800px){
+ .top{height:70px;padding:5px 7px}.avatar{width:45px;height:45px;font-size:24px}.profile{min-width:128px}.name{font-size:13px}.lvl{font-size:9px}
+ .stats{gap:3px}.pill{font-size:11px;padding:5px 7px}.topBtns .iconBtn{width:38px;height:38px;font-size:18px}
+ #viewport{top:70px;bottom:59px}.world{touch-action:none}
+ #world{width:1900px;height:1200px}
+ #quests{top:9px;left:8px;width:155px}.card h3{font-size:14px}.small{font-size:10px}
+ #shop{top:9px;right:8px;width:160px}.label{font-size:10px;padding:5px 8px}
+ #fields{left:600px;top:405px;width:620px}.plot{height:105px}
+ #bottom{height:59px;justify-content:flex-start}.nav{min-width:88px;font-size:12px}
+}
+@media(max-width:800px) and (orientation:portrait){#game:before{content:"↻  Telefonu yatay çevir";position:fixed;z-index:200;inset:0;background:#183d1eeF;display:grid;place-items:center;text-align:center;font-size:27px;font-weight:900;padding:30px}}
+</style>
+</head>
+<body>
+<div id="game">
+<header class="top">
+ <div class="profile"><div class="avatar">👨‍🌾</div><div><div class="name">Çiftçi Ali</div><div class="lvl">⭐ Seviye <span id="level">5</span> · <span id="xp">340</span>/500 XP</div></div></div>
+ <div class="stats"><div class="pill">🪙 <span id="coins">2500</span></div><div class="pill g">💎 <span id="gems">35</span></div><div class="pill e">⚡ <span id="energy">100</span>/100</div></div>
+ <div class="topBtns"><button class="iconBtn" onclick="openModal('daily')">🎁</button><button class="iconBtn" onclick="toggleFullscreen()">⛶</button></div>
+</header>
+
+<main id="viewport">
+<section id="world">
+ <div class="path p1"></div><div class="path p2"></div><div class="path p3"></div>
+ <div class="obj house">🏡</div><div class="obj barn">🐄🏠</div><div class="obj mill">🌾🏚️</div>
+ <div class="obj pond">💧</div><div class="obj mine">⛏️🪨</div><div class="obj market">🏪</div><div class="obj well">🪣</div>
+ <div class="obj tree t1">🌳</div><div class="obj tree t2">🌲</div><div class="obj tree t3">🌳</div><div class="obj tree t4">🌲</div>
+ <div class="obj tree t5">🌳</div><div class="obj tree t6">🌲</div><div class="obj tree t7">🌳</div><div class="obj tree t8">🌳</div>
+ <div class="label labfarm">🌾 TARLA BÖLGESİ</div><div class="label labmarket">🛒 KÖY PAZARI</div><div class="label labmine">⛏️ MADEN</div><div class="label labforest">🌲 ORMAN</div>
+ <div id="fields"></div>
+ <div id="quests" class="card"><h3>📋 Görevler</h3><div class="small">🌾 10 ürün hasat et</div><div class="bar"><i id="qbar" style="width:0%"></i></div><div class="small"><span id="qcount">0</span>/10</div><div class="small" style="margin-top:6px">💰 1000 🪙 kazan</div><div class="bar"><i id="moneybar" style="width:0%"></i></div></div>
+ <div id="shop" class="card"><h3>🛒 Tohum</h3><button onclick="selectSeed('wheat')">🌾 Buğday · 20 🪙</button><button onclick="selectSeed('corn')">🌽 Mısır · 35 🪙</button><button onclick="selectSeed('tomato')">🍅 Domates · 50 🪙</button></div>
+</section>
+</main>
+<nav id="bottom"><button class="nav active">🏡 Çiftlik</button><button class="nav" onclick="openModal('inventory')">📦 Depo</button><button class="nav" onclick="openModal('market')">🛒 Pazar</button><button class="nav" onclick="openModal('map')">🗺️ Harita</button><button class="nav" onclick="openModal('animals')">🐄 Hayvanlar</button><button class="nav" onclick="openModal('build')">🏗️ İnşa</button></nav>
+<div id="toast"></div>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="modalBox"><button class="close" onclick="closeModal()">✕</button><div id="modalContent"></div></div></div>
+</div>
+
+<script>
+const C={
+ wheat:{emoji:"🌾",name:"Buğday",time:10,seed:20,sell:55},
+ corn:{emoji:"🌽",name:"Mısır",time:18,seed:35,sell:90},
+ tomato:{emoji:"🍅",name:"Domates",time:28,seed:50,sell:140}
+};
+let S={coins:2500,gems:35,energy:100,xp:340,level:5,harvested:0,seed:"wheat",wood:12,stone:8,gold:2,hay:5};
+let plots=Array(25).fill(null), inventory={wheat:0,corn:0,tomato:0,egg:0,milk:0};
+let drag=null,pointers=new Map(),panX=0,panY=0,zoom=1;
+
+function save(){localStorage.setItem("ciftlikKralligi",JSON.stringify({S,plots,inventory}));}
+function load(){try{let x=JSON.parse(localStorage.getItem("ciftlikKralligi"));if(x){S=x.S;plots=x.plots||plots;inventory=x.inventory||inventory}}catch(e){}}
+function xp(n){S.xp+=n;while(S.xp>=500){S.xp-=500;S.level++;toast("🎉 Seviye atladın! Seviye "+S.level)}} 
+function render(){
+ document.getElementById("coins").textContent=S.coins;document.getElementById("gems").textContent=S.gems;document.getElementById("energy").textContent=S.energy;
+ document.getElementById("level").textContent=S.level;document.getElementById("xp").textContent=S.xp;
+ document.getElementById("qcount").textContent=S.harvested;document.getElementById("qbar").style.width=Math.min(100,S.harvested*10)+"%";
+ document.getElementById("moneybar").style.width=Math.min(100,Math.max(0,(2500-S.coins+1000)/10))+"%";
+ const f=document.getElementById("fields");f.innerHTML="";
+ plots.forEach((p,i)=>{let d=document.createElement("div");d.className="plot"+(!p?" empty":"")+(p&&Date.now()>=p.finish?" ready":"");
+   if(p){let left=Math.max(0,Math.ceil((p.finish-Date.now())/1000));d.innerHTML=C[p.type].emoji+(left?`<div class="tm">⏳ ${left} sn</div>`:"");}
+   d.onclick=()=>p?harvest(i):plant(i);f.appendChild(d)});
+ save();
+}
+function selectSeed(t){S.seed=t;toast(C[t].emoji+" "+C[t].name+" seçildi");}
+function plant(i){if(S.energy<=0)return toast("⚡ Enerjin bitti!");let c=C[S.seed];if(S.coins<c.seed)return toast("🪙 Tohum almak için paran yetmiyor!");
+ S.coins-=c.seed;S.energy--;plots[i]={type:S.seed,finish:Date.now()+c.time*1000};toast(c.emoji+" Ekildi!");render();}
+function harvest(i){let p=plots[i];if(Date.now()<p.finish)return toast("⏳ Henüz büyümedi!");
+ let c=C[p.type];inventory[p.type]++;S.coins+=c.sell;S.energy=Math.min(100,S.energy+2);S.harvested++;xp(15);plots[i]=null;toast("🎉 "+c.name+" hasat edildi! +"+c.sell+" 🪙");render();}
+function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.__t);window.__t=setTimeout(()=>x.classList.remove("show"),1800)}
+function openModal(type){
+ let c=document.getElementById("modalContent");
+ if(type==="inventory")c.innerHTML="<h2>📦 Depo</h2>"+Object.entries(inventory).map(([k,v])=>`<div class='row'><span>${k==="egg"?"🥚 Yumurta":k==="milk"?"🥛 Süt":C[k]?.emoji+" "+C[k]?.name}</span><b>${v}</b></div>`).join("")+`<div class='row'><span>🌲 Odun</span><b>${S.wood}</b></div><div class='row'><span>🪨 Taş</span><b>${S.stone}</b></div>`;
+ if(type==="market")c.innerHTML=`<h2>🛒 Pazar</h2><p>Hasat ürünlerini burada satıyorsun.</p>${["wheat","corn","tomato"].map(k=>`<button onclick="sell('${k}')">${C[k].emoji} 1 ${C[k].name} sat · +${C[k].sell} 🪙</button>`).join("")}`;
+ if(type==="animals")c.innerHTML=`<h2>🐄 Hayvanlar</h2><div class='row'><span>🐔 Tavuk</span><b>2</b></div><div class='row'><span>🐄 İnek</span><b>1</b></div><p class='small'>Hayvan sistemi sonraki geliştirmede üretim ve besleme ile genişletilebilir.</p>`;
+ if(type==="build")c.innerHTML=`<h2>🏗️ İnşa</h2><button onclick="build('silo',300,5,3)">📦 Silo · 300 🪙</button><button onclick="build('barn',600,10,8)">🐄 Ahır · 600 🪙</button><button onclick="build('mill',900,15,10)">🌾 Değirmen · 900 🪙</button>`;
+ if(type==="map")c.innerHTML=`<h2>🗺️ Harita</h2><p>🌾 Çiftlik merkezde. 🛒 Pazar sağda, ⛏️ maden solda, 🌲 orman kuzeydoğuda.</p><button onclick="closeModal();centerWorld()">🎯 Çiftliğe dön</button>`;
+ if(type==="daily")c.innerHTML=`<h2>🎁 Günlük Ödül</h2><p>Bugünün ödülü: <b>250 🪙 + 2 💎</b></p><button onclick="daily()">Ödülü Al</button>`;
+ document.getElementById("modal").classList.add("show");
+}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function daily(){S.coins+=250;S.gems+=2;toast("🎁 Günlük ödül alındı!");closeModal();render()}
+function sell(k){if(inventory[k]<=0)return toast("📦 Depoda ürün yok!");inventory[k]--;S.coins+=C[k].sell;toast("🪙 Satıldı! +"+C[k].sell);render();openModal("market")}
+function build(name,cost,wood,stone){if(S.coins<cost||S.wood<wood||S.stone<stone)return toast("❌ Kaynakların yetmiyor!");S.coins-=cost;S.wood-=wood;S.stone-=stone;xp(40);toast("🏗️ "+name+" inşa edildi!");closeModal();render()}
+function centerWorld(){panX=0;panY=0;zoom=1;applyView()}
+function applyView(){document.getElementById("world").style.transform=`translate(calc(-50% + ${panX}px),calc(-50% + ${panY}px)) scale(${zoom})`}
+
+const world=document.getElementById("world");
+world.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"&&e.button!==0)return;world.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===1)drag={x:e.clientX,y:e.clientY,px:panX,py:panY};world.classList.add("dragging")});
+world.addEventListener("pointermove",e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===1&&drag){panX=drag.px+e.clientX-drag.x;panY=drag.py+e.clientY-drag.y;panX=Math.max(-760,Math.min(760,panX));panY=Math.max(-470,Math.min(470,panY));applyView()}});
+function up(e){pointers.delete(e.pointerId);if(!pointers.size){drag=null;world.classList.remove("dragging")}}
+world.addEventListener("pointerup",up);world.addEventListener("pointercancel",up);
+world.addEventListener("wheel",e=>{e.preventDefault();zoom+=e.deltaY<0?.08:-.08;zoom=Math.max(.7,Math.min(1.4,zoom));applyView()},{passive:false});
+
+async function toggleFullscreen(){try{if(!document.fullscreenElement){await document.documentElement.requestFullscreen();if(screen.orientation?.lock)await screen.orientation.lock("landscape")}else await document.exitFullscreen()}catch(e){toast("📱 Telefonu yatay kullanabilirsin!")}}
+
+load();render();applyView();
+setInterval(()=>{render()},1000);
+</script>
+</body>
+</html>
