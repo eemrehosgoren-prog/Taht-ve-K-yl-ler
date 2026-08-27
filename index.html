@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Devletler Çağı — Strateji</title>
+<style>
+:root{
+  --bg:#08111d;--panel:#0e1a2a;--panel2:#132338;--line:#243851;--text:#eef5ff;
+  --muted:#8fa5bd;--gold:#f6c453;--green:#4bd38a;--red:#ff6475;--blue:#54a8ff;--purple:#a879ff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050b12;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.app{height:100dvh;display:flex;flex-direction:column;background:radial-gradient(circle at 50% -20%,#17304d 0,#08111d 45%,#050b12 100%)}
+.topbar{height:66px;display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(7,14,24,.94);border-bottom:1px solid var(--line);z-index:10}
+.brand{min-width:170px;font-weight:900;letter-spacing:.5px}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-top:2px}
+.stats{display:flex;gap:7px;flex:1;overflow:auto;scrollbar-width:none}.stats::-webkit-scrollbar{display:none}
+.stat{min-width:108px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:#0d1928}
+.stat b{display:block;font-size:14px}.stat span{font-size:10px;color:var(--muted)}
+.icon{font-size:18px}.gold{color:var(--gold)}.green{color:var(--green)}.blue{color:var(--blue)}.red{color:var(--red)}
+.body{min-height:0;flex:1;display:flex;position:relative}
+.sidebar{width:220px;background:#091321;border-right:1px solid var(--line);padding:10px;z-index:8;display:flex;flex-direction:column;gap:6px}
+.nav{padding:12px;border-radius:10px;background:transparent;text-align:left;color:#a9bdd2;font-weight:700}
+.nav.active,.nav:hover{background:#17273b;color:#fff}.nav .ico{width:25px;display:inline-block}
+.main{min-width:0;flex:1;position:relative;overflow:hidden}
+.view{display:none;height:100%;overflow:auto;padding:16px}.view.active{display:block}
+.mapview{padding:0!important;overflow:hidden!important}
+.mapwrap{position:absolute;inset:0;background:#101c25}
+#map{position:absolute;width:1900px;height:1200px;left:50%;top:50%;transform:translate(-50%,-50%);touch-action:none}
+canvas{display:block}
+.mapoverlay{position:absolute;inset:0;pointer-events:none}
+.mapcard{position:absolute;left:14px;top:14px;background:rgba(8,16,26,.88);border:1px solid #2b4058;border-radius:12px;padding:10px 12px;backdrop-filter:blur(8px);pointer-events:auto}
+.mapcard b{font-size:13px}.mapcard span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.maptools{position:absolute;right:14px;top:14px;display:flex;gap:6px;pointer-events:auto}
+.tool{width:42px;height:42px;border-radius:10px;background:rgba(8,16,26,.9);border:1px solid #2b4058;font-size:18px}
+.toast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:#15263b;border:1px solid #3a5672;padding:10px 14px;border-radius:10px;pointer-events:none;transition:.25s;white-space:nowrap;z-index:30}.toast.show{opacity:1;transform:translateX(-50%)}
+h1{margin:0 0 4px;font-size:24px}.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:linear-gradient(145deg,#101e30,#0b1726);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 10px 25px rgba(0,0,0,.16)}
+.card h3{margin:0 0 8px;font-size:14px}.big{font-size:27px;font-weight:900}.muted{color:var(--muted)}.small{font-size:11px}
+.progress{height:7px;background:#07101b;border-radius:99px;overflow:hidden;margin-top:9px}.progress i{display:block;height:100%;background:var(--blue);width:50%}
+.sectiontitle{display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px}
+.sectiontitle h2{font-size:17px;margin:0}
+.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #1b2d42;text-align:left;font-size:12px}.table th{color:var(--muted);font-size:10px;text-transform:uppercase}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.btn{padding:9px 12px;border-radius:9px;background:#1a2d45;border:1px solid #2c4664;font-weight:800;font-size:12px}.btn:hover{background:#223a57}.btn.primary{background:#1e6d52;border-color:#2b9b73}.btn.danger{background:#612536;border-color:#9e3d55}.btn.gold{background:#5b4518;border-color:#9b7929;color:#ffe49a}
+.unitgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.unit{padding:12px;border:1px solid var(--line);border-radius:12px;background:#0d1a2a}.unit .emoji{font-size:30px}.unit h3{margin:6px 0 4px}.tag{display:inline-block;padding:3px 7px;border-radius:99px;background:#172a40;color:#9ec8f4;font-size:10px;margin-right:4px}
+.tech{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.tech .card{min-height:130px}.locked{opacity:.5}.req{color:var(--gold);font-size:10px}
+.bottomnav{display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}.modal.show{display:flex}
+.modalbox{width:min(650px,96vw);max-height:88vh;overflow:auto;background:#0c1726;border:1px solid #304962;border-radius:16px;padding:18px;box-shadow:0 25px 70px #000}
+.close{float:right;background:#182a40;width:34px;height:34px;border-radius:9px}.queue{margin-top:12px}.qrow{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid var(--line);border-radius:9px;margin-top:6px}.qrow .grow{flex:1}
+@media(max-width:900px){
+  .brand{min-width:130px}.sidebar{width:180px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.unitgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.tech{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px){
+  .topbar{height:58px}.brand{display:none}.stat{min-width:90px;padding:6px 8px}.stat b{font-size:12px}
+  .sidebar{display:none}.view{padding:12px}.bottomnav{height:58px;display:flex;background:#091321;border-top:1px solid var(--line);z-index:20}
+  .bottomnav button{flex:1;background:none;color:#7f96ad;font-size:10px;font-weight:700}.bottomnav button.active{color:#fff}.bottomnav .ico{display:block;font-size:18px;margin-bottom:2px}
+  .grid,.grid3{grid-template-columns:1fr 1fr}.unitgrid{grid-template-columns:1fr 1fr}.tech{grid-template-columns:1fr}
+  h1{font-size:20px}
+}
+
+.battle-map-card{overflow:hidden}
+.battle-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.battle-ticker{padding:8px 12px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:#111b27;font-weight:700}
+.battle-map{height:430px;position:relative;overflow:hidden;border-radius:16px;background:
+ radial-gradient(circle at 20% 30%,rgba(42,112,72,.28),transparent 25%),
+ radial-gradient(circle at 80% 65%,rgba(110,67,48,.25),transparent 25%),
+ linear-gradient(135deg,#10242a,#162b22 48%,#29221c);border:1px solid rgba(255,255,255,.1)}
+.battle-map:before,.battle-map:after{content:"";position:absolute;background:rgba(255,255,255,.07);height:2px;left:-10%;right:-10%;transform:rotate(-14deg);top:48%}
+.battle-map:after{transform:rotate(17deg);top:67%}
+.front-line{position:absolute;left:48%;top:-10%;width:4px;height:120%;background:linear-gradient(transparent,#f04444 15%,#f04444 85%,transparent);box-shadow:0 0 18px #f04444;transform:rotate(12deg);z-index:2}
+.battle-city{position:absolute;z-index:3;padding:8px 11px;border-radius:12px;background:rgba(8,14,20,.82);border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px}
+.battle-city span{display:block;height:4px;margin-top:5px;border-radius:4px;background:#d5a84b;width:80%}
+.city-a{left:18%;top:28%}.city-b{left:27%;top:70%}.city-c{right:14%;top:22%}
+.unit-marker{position:absolute;z-index:5;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;font-size:25px;cursor:pointer;transition:.35s;box-shadow:0 0 0 3px rgba(255,255,255,.08),0 8px 22px rgba(0,0,0,.35)}
+.player-unit{background:#1e5f91}.enemy-unit{background:#873a3a}
+.u1{left:29%;top:38%}.u2{left:38%;top:62%}.e1{right:30%;top:36%}.e2{right:23%;top:68%}
+.battle-controls{position:absolute;z-index:8;bottom:14px;left:14px;right:14px;display:flex;gap:8px;align-items:center;padding:10px;border-radius:14px;background:rgba(5,10,15,.84);backdrop-filter:blur(8px)}
+.battle-controls select{flex:1;min-width:0}
+@media(max-width:700px){.battle-map{height:360px}.battle-controls{flex-wrap:wrap}.battle-controls select{width:100%;flex-basis:100%}}
+
+.tactical-unit{position:absolute;z-index:7;min-width:46px;height:46px;padding:0 7px;display:flex;align-items:center;justify-content:center;gap:3px;border-radius:13px;border:2px solid rgba(255,255,255,.35);cursor:grab;user-select:none;touch-action:none;font-weight:900;box-shadow:0 8px 25px rgba(0,0,0,.35);transition:box-shadow .2s,transform .15s}
+.tactical-unit.player{background:#155c91}.tactical-unit.enemy{background:#853939}.tactical-unit.selected{box-shadow:0 0 0 4px rgba(255,220,90,.75),0 0 28px rgba(255,210,60,.45);transform:scale(1.08)}
+.unit-label{font-size:10px;white-space:nowrap}
+.range-ring{position:absolute;border:2px dashed rgba(255,215,90,.65);border-radius:50%;pointer-events:none;z-index:4}
+.capture-zone{position:absolute;z-index:2;border:2px dashed rgba(255,255,255,.35);border-radius:18px;padding:5px 9px;font-size:10px;background:rgba(0,0,0,.3)}
+.cz1{left:17%;top:22%}.cz2{left:25%;top:64%}.cz3{right:12%;top:16%}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand">⚔️ DEVLETLER ÇAĞI<small>ONLINE STRATEJİ • v1.0</small></div>
+  <div class="stats">
+    <div class="stat"><span>👥 NÜFUS</span><b id="population">25,000</b></div>
+    <div class="stat"><span>💰 PARA</span><b class="gold" id="money">100,000</b></div>
+    <div class="stat"><span>🛢️ PETROL</span><b class="blue" id="oil">12,000</b></div>
+    <div class="stat"><span>⚔️ SAVAŞ GÜCÜ</span><b class="red" id="power">1,240</b></div>
+    <div class="stat"><span>🏭 SANAYİ</span><b id="industry">100</b></div>
+  </div>
+</header>
+<div class="body">
+<aside class="sidebar">
+  <button class="nav active" data-view="map"><span class="ico">🌍</span> Dünya Haritası</button>
+  <button class="nav" data-view="overview"><span class="ico">🏛️</span> Devletim</button>
+  <button class="nav" data-view="production"><span class="ico">🏭</span> Üretim</button>
+  <button class="nav" data-view="army"><span class="ico">⚔️</span> Ordu & Envanter</button>
+  <button class="nav" data-view="research"><span class="ico">🔬</span> Teknoloji</button>
+  <button class="nav" data-view="defense"><span class="ico">🛡️</span> Savunma</button>
+  <button class="nav" data-view="war"><span class="ico">⚔️</span> Savaş</button>
+  <button class="nav" data-view="cities"><span class="ico">🏙️</span> Şehirler</button>
+  <button class="nav" data-view="industry"><span class="ico">🏭</span> Sanayi</button>
+  <button class="nav" data-view="diplomacy"><span class="ico">🤝</span> Diplomasi</button>
+</aside>
+
+<main class="main">
+<section class="view active mapview" id="view-map">
+  <div class="mapwrap" id="mapwrap">
+    <canvas id="map" width="2200" height="1400"></canvas>
+    <div class="mapoverlay">
+      <div class="mapcard"><b>🌍 Dünya Haritası</b><span>Parmağınla sürükle • iki parmakla yakınlaştır</span></div>
+      <div class="maptools"><button class="tool" id="zoomIn">＋</button><button class="tool" id="zoomOut">−</button><button class="tool" id="centerMap">⌖</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="view-overview">
+  <h1>Devletim</h1><div class="sub">Ekonomini büyüt, nüfusunu yönet ve savaş gücünü geliştir.</div>
+  <div class="grid">
+    <div class="card"><h3>👥 Nüfus</h3><div class="big" id="ovPop">25,000</div><div class="muted small">+125 / dk</div><div class="progress"><i style="width:64%"></i></div></div>
+    <div class="card"><h3>💰 Hazine</h3><div class="big gold" id="ovMoney">100,000</div><div class="muted small">+350 / dk</div><div class="progress"><i style="width:42%"></i></div></div>
+    <div class="card"><h3>🛢️ Petrol</h3><div class="big blue" id="ovOil">12,000</div><div class="muted small">+80 / dk</div><div class="progress"><i style="width:51%"></i></div></div>
+    <div class="card"><h3>⚔️ Savaş Gücü</h3><div class="big red" id="ovPower">1,240</div><div class="muted small">Ordu seviyesi: 4</div><div class="progress"><i style="width:31%"></i></div></div>
+  </div>
+  <div class="sectiontitle"><h2>Ülke Gelişimi</h2><span class="muted small">Seviye 7</span></div>
+  <div class="grid3">
+    <div class="card"><h3>🏭 Sanayi</h3><div class="big" id="ovIndustry">100</div><p class="muted small">Fabrika kapasitesi ve üretim hızı.</p><button class="btn primary" onclick="upgradeIndustry()">Sanayiyi Geliştir • 15K 💰</button></div>
+    <div class="card"><h3>🛢️ Petrol Makinesi</h3><div class="big" id="ovOilMachine">2</div><p class="muted small">Her makine +40 petrol/dk.</p><button class="btn" onclick="buyOilMachine()">Yeni Makine • 8K 💰</button></div>
+    <div class="card"><h3>🏙️ Şehirler</h3><div class="big">4</div><p class="muted small">Ankara, İstanbul, Gaziantep, İzmir</p><button class="btn" onclick="toast('Şehir yönetimi yakında açılıyor.')">Yönet</button></div>
+  </div>
+</section>
+
+<section class="view" id="view-army-old">
+  <h1>Ordu & Konuşlandırma</h1>
+  <div class="sub">Envanterindeki birlikleri şehirlerine ve ordularına dağıt.</div>
+  <div class="grid3">
+    <div class="card"><h3>🪖 Kara Birlikleri</h3><div class="big" id="deployLand">0</div><div class="muted small">Konuşlandırılabilir birlik</div></div>
+    <div class="card"><h3>✈️ Hava Birlikleri</h3><div class="big" id="deployAir">0</div><div class="muted small">Konuşlandırılabilir birlik</div></div>
+    <div class="card"><h3>🚢 Deniz Birlikleri</h3><div class="big" id="deploySea">0</div><div class="muted small">Konuşlandırılabilir birlik</div></div>
+  </div>
+  <div class="sectiontitle"><h2>Ordular</h2></div>
+  <div class="grid3" id="armies"></div>
+  <div class="sectiontitle"><h2>Şehirler ve Üsler</h2></div>
+  <div class="grid3" id="cityPanel"></div>
+</section>
+
+<section class="view" id="view-production">
+  <h1>Üretim Merkezi</h1><div class="sub">Bir ekipman satın aldığında üretim lisansını açarsın. Sonrasında istediğin zaman üretip envanterine eklersin.</div>
+  <div class="card">
+    <h3>🏭 Üretim Kuyruğu</h3><div class="queue" id="queue"><div class="muted small">Kuyruk boş. Aşağıdan birim üret.</div></div>
+  </div>
+  <div class="sectiontitle"><h2>Kara Kuvvetleri</h2></div><div class="unitgrid" id="landUnits"></div>
+  <div class="sectiontitle"><h2>Hava Kuvvetleri</h2></div><div class="unitgrid" id="airUnits"></div>
+  <div class="sectiontitle"><h2>Deniz Kuvvetleri</h2></div><div class="unitgrid" id="seaUnits"></div>
+  <div class="sectiontitle"><h2>Füzeler</h2></div><div class="unitgrid" id="missileUnits"></div>
+</section>
+
+<section class="view" id="view-army">
+  <h1>Ordu & Envanter</h1><div class="sub">Ürettiğin tüm birlikler burada kalıcı olarak envanterine eklenir.</div>
+  <div class="card"><table class="table"><thead><tr><th>Birim</th><th>Sınıf</th><th>Adet</th><th>Savaş Gücü</th></tr></thead><tbody id="inventory"></tbody></table></div>
+  <div class="sectiontitle"><h2>Ordu Özeti</h2></div>
+  <div class="grid3">
+    <div class="card"><h3>🪖 Kara</h3><div class="big" id="landCount">0</div></div>
+    <div class="card"><h3>✈️ Hava</h3><div class="big" id="airCount">0</div></div>
+    <div class="card"><h3>🚢 Deniz</h3><div class="big" id="seaCount">0</div></div>
+  </div>
+</section>
+
+
+function armyPower(a){return Object.entries(a).reduce((s,[id,n])=>s+(units[id]?.power||0)*n,0)}
+function renderArmies(){
+ const box=document.getElementById('armies'); box.innerHTML='';
+ Object.entries(state.armies).forEach(([name,a])=>{
+   const total=Object.values(a).reduce((x,v)=>typeof v==='number'?x+v:x,0);
+   const rows=Object.entries(a).filter(([k,v])=>k!=='city'&&v>0).map(([k,v])=>`${units[k]?.emoji||'•'} ${units[k]?.name||k}: ${v}`).join(' · ')||'Henüz birlik yok';
+   const c=document.createElement('div');c.className='card';
+   c.innerHTML=`<h3>⚔️ ${name}</h3><p class="muted small">📍 ${state.cities[a.city]?.name||a.city}</p><div class="big">${fmt(total)}</div><div class="small muted">Toplam birlik • Güç ${fmt(armyPower(a))}</div><p class="small">${rows}</p><button class="btn" onclick="moveArmy('${name}')">📍 Konum Değiştir</button>`;
+   box.appendChild(c);
+ });
+}
+function renderCities(){
+ const box=document.getElementById('cityPanel');box.innerHTML='';
+ Object.entries(state.cities).forEach(([id,c])=>{
+   const army=Object.entries(state.armies).find(([n,a])=>a.city===id);
+   const el=document.createElement('div');el.className='card';
+   el.innerHTML=`<h3>🏙️ ${c.name}</h3><p class="small muted">👥 ${fmt(c.population)} nüfus</p>
+   <div class="small">🏭 Sanayi <b>${c.industry}</b></div><div class="progress"><i style="width:${c.industry}%"></i></div>
+   <div class="small" style="margin-top:8px">🛡️ Savunma <b>${c.defense}</b></div><div class="progress"><i style="width:${c.defense}%"></i></div>
+   <p class="small muted">⚔️ ${army?army[0]:'Savunma ordusu yok'}</p>
+   <button class="btn primary" onclick="openDeploy('${id}')">Birlik Konuşlandır</button>`;
+   box.appendChild(el);
+ });
+}
+function openDeploy(cityId){
+ const available=Object.entries(state.inventory).filter(([id,n])=>n>0);
+ document.getElementById('modalContent').innerHTML=`<h1>📍 ${state.cities[cityId].name}</h1>
+ <div class="sub">Envanterden birlik seç ve bu şehre konuşlandır.</div>
+ <div class="grid3">${available.map(([id,n])=>`<div class="card"><div style="font-size:28px">${units[id].emoji}</div><h3>${units[id].name}</h3><div class="small muted">Envanter: ${n}</div><button class="btn primary" onclick="deploy('${cityId}','${id}')">+1 Konuşlandır</button></div>`).join('')}</div>`;
+ document.getElementById('modal').classList.add('show');
+}
+function deploy(cityId,id){
+ if((state.inventory[id]||0)<=0)return toast('Envanterde bu birlik yok.');
+ state.inventory[id]--; const city=state.cities[cityId];
+ let armyName=Object.entries(state.armies).find(([n,a])=>a.city===cityId)?.[0];
+ if(!armyName){armyName=city.name+' Ordusu';state.armies[armyName]={city:cityId};}
+ state.armies[armyName][id]=(state.armies[armyName][id]||0)+1;
+ toast(`${units[id].name} → ${city.name} konuşlandırıldı.`);
+ closeModal();update();
+}
+function moveArmy(name){
+ const a=state.armies[name];const cities=Object.entries(state.cities);
+ const opts=cities.map(([id,c])=>`<button class="btn" onclick="setArmyCity('${name}','${id}')">📍 ${c.name}</button>`).join(' ');
+ document.getElementById('modalContent').innerHTML=`<h1>📍 ${name}</h1><div class="sub">Ordunun yeni konuşlanma merkezini seç.</div><div class="actions">${opts}</div>`;
+ document.getElementById('modal').classList.add('show');
+}
+function setArmyCity(name,cityId){state.armies[name].city=cityId;toast(`${name} → ${state.cities[cityId].name}`);closeModal();update()}
+function renderDeploySummary(){
+ let land=0,air=0,sea=0;
+ Object.entries(state.inventory).forEach(([id,n])=>{const t=units[id]?.type;if(t==='Kara')land+=n;if(t==='Hava')air+=n;if(t==='Deniz')sea+=n});
+ document.getElementById('deployLand').textContent=fmt(land);document.getElementById('deployAir').textContent=fmt(air);document.getElementById('deploySea').textContent=fmt(sea);
+ renderArmies();renderCities();
+}
+<section class="view" id="view-research">
+  <h1>Teknoloji Ağacı</h1><div class="sub">Araştırmalar yeni ekipmanların üretim lisanslarını açar.</div>
+  <div class="tech" id="tech"></div>
+</section>
+
+<section class="view" id="view-defense">
+  <h1>🛡️ Savunma</h1><div class="sub">Ülkeni hava saldırılarına, füzelerine ve kara saldırılarına karşı güçlendir.</div>
+  <div class="grid3" id="defenses"></div>
+</section>
+
+
+<section class="view" id="view-cities">
+  <h1>🏙️ Şehir Yönetimi</h1>
+  <div class="sub">Şehirlerin ekonomisini, savunmasını ve stratejik değerini yönet.</div>
+  <div class="grid3" id="strategicCities"></div>
+</section>
+<section class="view" id="view-industry">
+  <h1>🏭 Askerî Sanayi</h1>
+  <div class="sub">Fabrikalarını geliştir; aynı anda daha fazla birlik üret.</div>
+  <div class="grid3" id="factories"></div>
+  <div class="sectiontitle"><h2>Birlik İstatistikleri</h2></div>
+  <div class="grid3" id="unitStats"></div>
+</section>
+<section class="view" id="view-war">
+  <h1>⚔️ Savaş Merkezi</h1>
+  <div class="sub">Rakip devlet seç, cephe oluştur ve ordularını savaşa gönder.</div>
+  
+<div class="card battle-map-card">
+  <div class="battle-head"><div><h2>🗺️ Canlı Cephe Haritası</h2><div class="muted small">Ordunu seç, cephede hareket ettir ve saldır.</div></div><div id="battleTicker" class="battle-ticker">Hazır</div></div>
+  <div id="battleMap" class="battle-map">
+    <div class="front-line"></div>
+    <div class="battle-city city-a">🏙️ <b>Başkent</b><span></span></div>
+    <div class="battle-city city-b">🏭 <b>Batı Şehri</b><span></span></div>
+    <div class="battle-city city-c">⚓ <b>Kuzey Limanı</b><span></span></div>
+    <div class="unit-marker player-unit u1" data-army="1. Ordu">🪖</div>
+    <div class="unit-marker player-unit u2" data-army="Batı Ordusu">🪖</div>
+    <div class="unit-marker enemy-unit e1">⚔️</div>
+    <div class="unit-marker enemy-unit e2">⚔️</div>
+    <div id="tacticalUnits"></div>
+    <div class="battle-controls">
+      <select id="battleArmySelect"></select>
+      <button class="btn primary" onclick="moveSelectedArmy()">📍 Hareket</button>
+      <button class="btn danger" onclick="attackFront()">⚔️ Saldır</button>
+      <button class="btn" onclick="selectTargetMode()">🎯 Hedef Seç</button>
+    </div>
+  </div>
+</div>
+<div class="grid3" id="warStats"></div>
+  <div class="sectiontitle"><h2>Aktif Savaşlar</h2></div>
+  <div id="wars"></div>
+  <div class="sectiontitle"><h2>Rakip Devletler</h2></div>
+  <div class="grid3" id="enemies"></div>
+</section>
+
+<section class="view" id="view-diplomacy">
+  <h1>🤝 Diplomasi</h1><div class="sub">Komşularınla ilişki kur, ticaret yap veya ittifak oluştur.</div>
+  <div class="grid3" id="countries"></div>
+</section>
+</main>
+</div>
+
+<nav class="bottomnav">
+  <button class="active" data-view="map"><span class="ico">🌍</span>Harita</button>
+  <button data-view="overview"><span class="ico">🏛️</span>Devlet</button>
+  <button data-view="production"><span class="ico">🏭</span>Üret</button>
+  <button data-view="army"><span class="ico">⚔️</span>Ordu</button>
+  <button data-view="war"><span class="ico">⚔️</span>Savaş</button>
+</nav>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const fmt=n=>Math.floor(n).toLocaleString('tr-TR');
+const state={
+ population:25000,money:100000,oil:12000,power:1240,industry:100,oilMachines:2,
+ production:[],
+ inventory:{tank:4,heavyTank:0,apc:8,fighter:2,interceptor:0,bomber:0,heli:2,corvette:1,frigate:0,destroyer:0,submarine:0,cruise:3,ballistic:0,drone:6},
+ unlocked:{tank:true,heavyTank:false,apc:true,fighter:true,interceptor:false,bomber:false,heli:true,corvette:true,frigate:false,destroyer:false,submarine:false,cruise:true,ballistic:false,drone:true},
+ defense:{sam:1,radar:1,aa:2,bunker:0,shield:0},
+cities:{
+ capital:{name:'Başkent',population:850000,defense:65,industry:80,army:'1. Ordu'},
+ west:{name:'Batı Şehri',population:620000,defense:45,industry:92,army:'Batı Ordusu'},
+ northport:{name:'Kuzey Limanı',population:410000,defense:58,industry:55,army:'Kuzey Filosu'},
+ southcity:{name:'Güney Şehri',population:530000,defense:40,industry:61,army:'Güney Ordusu'}
+},
+armies:{
+ '1. Ordu':{city:'capital',tank:2,heavyTank:0,apc:3,fighter:0,heli:1},
+ 'Batı Ordusu':{city:'west',tank:2,heavyTank:0,apc:5,fighter:2,heli:1},
+ 'Kuzey Filosu':{city:'northport',corvette:1,frigate:0,destroyer:0,submarine:0},
+ 'Güney Ordusu':{city:'southcity',tank:0,heavyTank:0,apc:0,fighter:0,heli:0}
+},wars:[],
+warLog:[],
+factories:{
+ tankFactory:{name:'Tank Fabrikası',level:1,kind:'Kara',cost:18000,bonus:1},
+ aircraftFactory:{name:'Uçak Fabrikası',level:1,kind:'Hava',cost:26000,bonus:1},
+ shipyard:{name:'Donanma Tersanesi',level:1,kind:'Deniz',cost:32000,bonus:1},
+ missilePlant:{name:'Füze Tesisi',level:1,kind:'Füze',cost:40000,bonus:1},
+ radarPlant:{name:'Elektronik/Radar Tesisi',level:1,kind:'Elektronik',cost:22000,bonus:1}
+},
+
+ tech:{industry:false,armor:false,jet:false,navy:false,missile:false,radar:false}
+};
+const units={
+ tank:{name:'Ana Muharebe Tankı',emoji:'🪖',type:'Kara',cost:9000,oil:80,time:7,power:45},
+ heavyTank:{name:'Ağır Tank',emoji:'🛡️',type:'Kara',cost:16000,oil:140,time:12,power:85,req:'armor'},
+ apc:{name:'Zırhlı Personel Aracı',emoji:'🚙',type:'Kara',cost:5500,oil:45,time:5,power:18},
+ fighter:{name:'Savaş Uçağı',emoji:'✈️',type:'Hava',cost:28000,oil:220,time:15,power:130},
+ interceptor:{name:'Önleme Uçağı',emoji:'🛩️',type:'Hava',cost:34000,oil:250,time:18,power:155,req:'jet'},
+ bomber:{name:'Bombardıman Uçağı',emoji:'💣',type:'Hava',cost:52000,oil:420,time:25,power:250,req:'jet'},
+ heli:{name:'Taarruz Helikopteri',emoji:'🚁',type:'Hava',cost:22000,oil:180,time:13,power:95},
+ corvette:{name:'Korvet',emoji:'🚤',type:'Deniz',cost:24000,oil:180,time:20,power:110},
+ frigate:{name:'Fırkateyn',emoji:'⛴️',type:'Deniz',cost:48000,oil:300,time:30,power:220,req:'navy'},
+ destroyer:{name:'Muhrip',emoji:'🚢',type:'Deniz',cost:80000,oil:500,time:42,power:380,req:'navy'},
+ submarine:{name:'Denizaltı',emoji:'🌊',type:'Deniz',cost:95000,oil:420,time:48,power:430,req:'navy'},
+ cruise:{name:'Seyir Füzesi',emoji:'🚀',type:'Füze',cost:12000,oil:90,time:8,power:120},
+ ballistic:{name:'Balistik Füze',emoji:'☄️',type:'Füze',cost:45000,oil:220,time:16,power:420,req:'missile'},
+ drone:{name:'İHA',emoji:'🛰️',type:'Hava',cost:7000,oil:50,time:4,power:25}
+};
+function save(){localStorage.setItem('devletlerState',JSON.stringify(state))}
+function load(){try{Object.assign(state,JSON.parse(localStorage.getItem('devletlerState'))||{})}catch(e){}}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove('show'),2200)}
+function update(){
+ ['population','money','oil','power','industry'].forEach(k=>document.getElementById(k).textContent=fmt(state[k]));
+ ['Pop','Money','Oil','Power','Industry'].forEach(k=>{const a=k.toLowerCase();const el=document.getElementById('ov'+k);if(el)el.textContent=fmt(state[a])});
+ document.getElementById('ovOilMachine').textContent=state.oilMachines;
+ renderInventory();renderProduction();renderTech();renderDefense();renderCountries();renderDeploySummary();renderWars();renderBattleMap();renderStrategicCities();renderFactories();renderUnitStats();save();
+}
+function canMake(id){const u=units[id];return state.unlocked[id]&&!state.production.length>=99 && state.money>=u.cost&&state.oil>=u.oil}
+function produce(id){
+ const u=units[id];
+ if(!state.unlocked[id]) return toast('Bu üretim lisansı kilitli. Teknoloji araştır.');
+ if(state.money<u.cost)return toast('Yetersiz para.');
+ if(state.oil<u.oil)return toast('Yetersiz petrol.');
+ state.money-=u.cost;state.oil-=u.oil;
+ const item={id,remaining:u.time};
+ state.production.push(item);
+ toast(`${u.name} üretim kuyruğuna eklendi.`);
+ update();
+}
+function renderProduction(){
+ const groups={landUnits:[],airUnits:[],seaUnits:[],missileUnits:[]};
+ Object.entries(units).forEach(([id,u])=>{
+  const el=document.createElement('div');el.className='unit';
+  const locked=!state.unlocked[id];
+  el.innerHTML=`<div class="emoji">${u.emoji}</div><h3>${u.name}</h3><span class="tag">${u.type}</span><span class="tag">⚔️ ${u.power}</span>
+  <p class="muted small">💰 ${fmt(u.cost)} • 🛢️ ${fmt(u.oil)} • ⏱️ ${u.time} sn</p>
+  ${locked?`<p class="req">🔒 ${u.req?'Teknoloji gerekli':'Kilitli'}</p>`:`<button class="btn primary" onclick="produce('${id}')">Üret +1</button>`}`;
+  const key=u.type==='Kara'?'landUnits':u.type==='Hava'?'airUnits':u.type==='Deniz'?'seaUnits':'missileUnits';
+  groups[key].push(el);
+ });
+ Object.entries(groups).forEach(([id,els])=>{const box=document.getElementById(id);box.innerHTML='';els.forEach(e=>box.appendChild(e))});
+}
+function renderQueue(){
+ const q=document.getElementById('queue');
+ if(!state.production.length){q.innerHTML='<div class="muted small">Kuyruk boş. Aşağıdan birim üret.</div>';return}
+ q.innerHTML=state.production.map((p,i)=>{const u=units[p.id];return `<div class="qrow"><span>${u.emoji}</span><div class="grow"><b>${u.name}</b><div class="small muted">Kalan: ${p.remaining} sn</div></div><div class="progress" style="width:120px"><i style="width:${Math.max(5,100-(p.remaining/u.time*100))}%"></i></div></div>`}).join('');
+}
+function renderProduction(){renderQueue();['landUnits','airUnits','seaUnits','missileUnits'].forEach(id=>document.getElementById(id).innerHTML='');Object.entries(units).forEach(([id,u])=>{
+ const box=document.getElementById(u.type==='Kara'?'landUnits':u.type==='Hava'?'airUnits':u.type==='Deniz'?'seaUnits':'missileUnits');
+ const el=document.createElement('div');el.className='unit';const locked=!state.unlocked[id];
+ el.innerHTML=`<div class="emoji">${u.emoji}</div><h3>${u.name}</h3><span class="tag">${u.type}</span><span class="tag">⚔️ ${u.power}</span><p class="muted small">💰 ${fmt(u.cost)} • 🛢️ ${fmt(u.oil)} • ⏱️ ${u.time} sn</p>${locked?`<p class="req">🔒 Araştırma gerekli</p>`:`<button class="btn primary" onclick="produce('${id}')">Üret +1</button>`}`;box.appendChild(el);
+})}
+function renderInventory(){
+ const body=document.getElementById('inventory');body.innerHTML='';
+ let land=0,air=0,sea=0;
+ Object.entries(state.inventory).forEach(([id,n])=>{if(!n)return;const u=units[id];if(u.type==='Kara')land+=n;if(u.type==='Hava')air+=n;if(u.type==='Deniz')sea+=n;
+ const tr=document.createElement('tr');tr.innerHTML=`<td>${u.emoji} ${u.name}</td><td>${u.type}</td><td><b>${fmt(n)}</b></td><td>${fmt(n*u.power)}</td>`;body.appendChild(tr)});
+ document.getElementById('landCount').textContent=fmt(land);document.getElementById('airCount').textContent=fmt(air);document.getElementById('seaCount').textContent=fmt(sea);
+}
+const techs=[
+ {id:'industry',name:'Sanayi Devrimi',emoji:'🏭',cost:20000,desc:'Üretim maliyetlerini düşürür, sanayi +25.'},
+ {id:'armor',name:'Gelişmiş Zırh',emoji:'🛡️',cost:30000,desc:'Ağır Tank üretimini açar.'},
+ {id:'jet',name:'Jet Teknolojisi',emoji:'✈️',cost:45000,desc:'Önleme ve Bombardıman uçaklarını açar.'},
+ {id:'navy',name:'Modern Donanma',emoji:'🚢',cost:50000,desc:'Fırkateyn, Muhrip ve Denizaltı açar.'},
+ {id:'missile',name:'Füze Teknolojisi',emoji:'🚀',cost:55000,desc:'Balistik Füze üretimini açar.'},
+ {id:'radar',name:'Aktif Radar',emoji:'📡',cost:25000,desc:'Radar savunmasını güçlendirir.'}
+];
+function research(id){
+ const t=techs.find(x=>x.id===id);if(state.tech[id])return;
+ if(state.money<t.cost)return toast('Araştırma için yeterli para yok.');
+ state.money-=t.cost;state.tech[id]=true;
+ if(id==='industry'){state.industry+=25}
+ if(id==='armor')state.unlocked.heavyTank=true;
+ if(id==='jet'){state.unlocked.interceptor=true;state.unlocked.bomber=true}
+ if(id==='navy'){state.unlocked.frigate=true;state.unlocked.destroyer=true;state.unlocked.submarine=true}
+ if(id==='missile')state.unlocked.ballistic=true;
+ toast(`${t.name} araştırıldı!`);update();
+}
+function renderTech(){document.getElementById('tech').innerHTML=techs.map(t=>`<div class="card ${state.tech[t.id]?'':'locked'}"><div style="font-size:28px">${t.emoji}</div><h3>${t.name}</h3><p class="muted small">${t.desc}</p>${state.tech[t.id]?'<span class="tag">✓ TAMAMLANDI</span>':`<button class="btn gold" onclick="research('${t.id}')">Araştır • ${fmt(t.cost)} 💰</button>`}</div>`).join('')}
+const defenseData=[
+ ['sam','🚀','Hava Savunma Sistemi',35000,'Füze tehditlerine karşı savunma.'],
+ ['radar','📡','Uzun Menzilli Radar',28000,'Tespit menzilini artırır.'],
+ ['aa','🎯','Hava Savunma Bataryası',18000,'Alçak irtifa hedeflerine karşı.'],
+ ['bunker','🏰','Güçlendirilmiş Sığınak',45000,'Şehirlerin hasarını azaltır.'],
+ ['shield','🛡️','Ulusal Savunma Ağı',100000,'İleri seviye savunma bonusu.']
+];
+function buyDefense(id){
+ const d=defenseData.find(x=>x[0]===id),cost=d[0]==='shield'?100000:d[0]==='bunker'?45000:d[0]==='radar'?28000:d[0]==='sam'?35000:18000;
+ if(state.money<cost)return toast('Yetersiz para.');
+ state.money-=cost;state.defense[id]++;state.power+=id==='sam'?20:id==='radar'?15:10;toast(`${d[2]} kuruldu.`);update();
+}
+function renderDefense(){document.getElementById('defenses').innerHTML=defenseData.map(d=>{const cost=d[0]==='shield'?100000:d[0]==='bunker'?45000:d[0]==='radar'?28000:d[0]==='sam'?35000:18000;return `<div class="card"><div style="font-size:30px">${d[1]}</div><h3>${d[2]}</h3><p class="muted small">${d[4]}</p><div class="big">${state.defense[d[0]]}</div><button class="btn primary" onclick="buyDefense('${d[0]}')">Kur • ${fmt(cost)} 💰</button></div>`}).join('')}
+const nations=[['🟦','Kuzey Birliği',62,'Ticaret anlaşması'],['🟥','Doğu Federasyonu',35,'Sınır gergin'],['🟩','Güney Cumhuriyeti',74,'Dostane'],['🟨','Batı Krallığı',48,'Tarafsız'],['🟪','Ada Konfederasyonu',81,'Stratejik ortak'],['⬛','Çöl Devletleri',28,'Petrol zengini']];
+function renderCountries(){document.getElementById('countries').innerHTML=nations.map(n=>`<div class="card"><div style="font-size:28px">${n[0]}</div><h3>${n[1]}</h3><p class="muted small">İlişki: <b>${n[2]}</b>/100</p><p class="small">${n[3]}</p><div class="actions"><button class="btn" onclick="diplomacy('${n[1]}','ticaret')">🤝 Ticaret</button><button class="btn" onclick="diplomacy('${n[1]}','ittifak')">🛡️ İttifak</button></div></div>`).join('')}
+function diplomacy(n,a){toast(`${n} ile ${a} görüşmesi başlatıldı.`)}
+const enemies=[
+ {id:'north',name:'Kuzey Federasyonu',flag:'🟥',power:2100,pop:41000,capital:'Novagrad',cities:5,relation:38},
+ {id:'east',name:'Doğu Birliği',flag:'🟪',power:3250,pop:67000,capital:'Orkent',cities:8,relation:22},
+ {id:'south',name:'Güney Cumhuriyeti',flag:'🟩',power:1450,pop:28000,capital:'Sahra',cities:4,relation:64},
+ {id:'west',name:'Batı Krallığı',flag:'🟨',power:2700,pop:52000,capital:'Westmark',cities:7,relation:46},
+ {id:'island',name:'Ada Konfederasyonu',flag:'🟦',power:1900,pop:35000,capital:'Port Azure',cities:3,relation:31},
+ {id:'desert',name:'Çöl İmparatorluğu',flag:'⬛',power:3800,pop:74000,capital:'Qamar',cities:9,relation:18}
+];
+function myArmyPower(){
+ return Object.values(state.armies).reduce((s,a)=>s+armyPower(a),0);
+}
+function declareWar(id){
+ const e=enemies.find(x=>x.id===id);
+ if(state.wars.some(w=>w.enemyId===id&&w.status==='active'))return toast('Bu devletle zaten savaştasın.');
+ if(state.money<10000)return toast('Savaş ilanı için 10.000 💰 gerekiyor.');
+ state.money-=10000;
+ state.wars.push({enemyId:id,enemy:e.name,status:'active',front:0,turn:0,enemyPower:e.power,ourPower:myArmyPower(),enemyCities:e.cities,won:0,lost:0});
+ toast(`${e.name} ile savaş başladı!`);
+ update();
+}
+function battle(wIndex){
+ const w=state.wars[wIndex]; if(!w||w.status!=='active')return;
+ const our=myArmyPower();
+ if(our<=0)return toast('Savaşacak ordun yok!');
+ if(state.oil<500)return toast('Cephe için en az 500 petrol gerekiyor.');
+ state.oil-=500; w.turn++;
+ const morale=0.88+Math.random()*.28;
+ const enemyRoll=w.enemyPower*(0.85+Math.random()*.3);
+ const ourRoll=our*morale;
+ const ourLoss=Math.max(1,Math.round(ourRoll<enemyRoll ? our*.055 : our*.025));
+ const enemyLoss=Math.max(1,Math.round(ourRoll>enemyRoll ? w.enemyPower*.075 : w.enemyPower*.03));
+ w.lost+=ourLoss;w.won+=enemyLoss;
+ if(ourRoll>enemyRoll){
+   w.front=Math.min(100,w.front+8+Math.floor(Math.random()*8));
+ }else{
+   w.front=Math.max(0,w.front-5-Math.floor(Math.random()*6));
+ }
+ if(w.front>=100 || w.enemyCities<=1){
+   w.status='victory';w.enemyCities=Math.max(0,w.enemyCities-1);
+   state.money+=30000;state.power+=80;
+   state.warLog.unshift(`${w.enemy} yenildi — savaş zaferi!`);
+   toast(`🏆 ${w.enemy} karşısında zafer!`);
+ }else if(w.front<=0 && w.turn>=8){
+   w.status='defeat';state.warLog.unshift(`${w.enemy} savaşı kaybedildi.`);
+   toast(`💀 ${w.enemy} savaşı kaybedildi.`);
+ }else{
+   w.enemyCities=Math.max(1,w.enemyCities-(w.front>60?1:0));
+   toast(`⚔️ Cephe ilerlemesi: %${w.front}`);
+ }
+ update();
+}
+
+let selectedArmyForBattle='1. Ordu';
+let frontProgress=42;
+
+const tacticalUnits=[
+ {id:'tankA',name:'1. Ordu',type:'tank',emoji:'🪖',x:31,y:38,enemy:false,hp:100},
+ {id:'tankB',name:'Batı Ordusu',type:'tank',emoji:'🪖',x:39,y:61,enemy:false,hp:100},
+ {id:'airA',name:'Hava Kanadı',type:'fighter',emoji:'✈️',x:36,y:25,enemy:false,hp:100},
+ {id:'enemyA',name:'Kuzey Kolordusu',type:'tank',emoji:'⚔️',x:66,y:37,enemy:true,hp:100},
+ {id:'enemyB',name:'Doğu Kolordusu',type:'tank',emoji:'⚔️',x:72,y:65,enemy:true,hp:100}
+];
+let selectedTactical=null,targetMode=false;
+function renderTacticalUnits(){
+ const box=document.getElementById('tacticalUnits');if(!box)return;box.innerHTML='';
+ tacticalUnits.forEach(u=>{
+   const el=document.createElement('div');el.className=`tactical-unit ${u.enemy?'enemy':'player'} ${selectedTactical===u.id?'selected':''}`;
+   el.style.left=u.x+'%';el.style.top=u.y+'%';el.innerHTML=`${u.emoji}<span class="unit-label">${u.name}<br>HP ${Math.max(0,Math.round(u.hp))}</span>`;
+   el.onpointerdown=e=>startUnitDrag(e,u.id);
+   el.onclick=e=>{e.stopPropagation();if(targetMode&&u.enemy){attackTactical(u.id)}else{selectedTactical=u.id;targetMode=false;renderTacticalUnits();toast(`${u.name} seçildi.`)}};
+   box.appendChild(el);
+ });
+}
+let dragUnit=null,dx=0,dy=0;
+function startUnitDrag(e,id){
+ const u=tacticalUnits.find(x=>x.id===id);if(!u||u.enemy)return;
+ selectedTactical=id;dragUnit=u;
+ const map=document.getElementById('battleMap'),r=map.getBoundingClientRect();
+ dx=e.clientX-r.left-(u.x/100*r.width);dy=e.clientY-r.top-(u.y/100*r.height);
+ document.addEventListener('pointermove',dragUnitMove);document.addEventListener('pointerup',endUnitDrag,{once:true});
+ e.preventDefault();
+}
+function dragUnitMove(e){
+ if(!dragUnit)return;const r=document.getElementById('battleMap').getBoundingClientRect();
+ dragUnit.x=Math.max(2,Math.min(92,((e.clientX-r.left-dx)/r.width)*100));
+ dragUnit.y=Math.max(8,Math.min(78,((e.clientY-r.top-dy)/r.height)*100));
+ renderTacticalUnits();
+}
+function endUnitDrag(){dragUnit=null;document.removeEventListener('pointermove',dragUnitMove)}
+function selectTargetMode(){if(!selectedTactical)return toast('Önce bir birlik seç.');targetMode=true;toast('Kırmızı düşman birliğine dokun.')}
+function attackTactical(enemyId){
+ const attacker=tacticalUnits.find(x=>x.id===selectedTactical),target=tacticalUnits.find(x=>x.id===enemyId);
+ if(!attacker||!target)return;
+ const dist=Math.hypot(attacker.x-target.x,attacker.y-target.y);
+ const ranges={tank:18,fighter:30};const range=ranges[attacker.type]||18;
+ if(dist>range)return toast(`Hedef menzil dışında. Menzil: ${range}`);
+ const advantage=attacker.type==='fighter'?1.35:1;
+ const dmg=Math.round((12+Math.random()*18)*advantage);
+ target.hp-=dmg;target.x=Math.max(8,target.x-(attacker.type==='fighter'?2:1));
+ if(target.hp<=0){target.hp=0;toast(`💥 ${target.name} etkisiz hale getirildi.`)}
+ else toast(`🎯 ${attacker.name} ${target.name} birliğine ${dmg} hasar verdi.`);
+ targetMode=false;renderTacticalUnits();
+}
+function renderBattleMap(){
+ const sel=document.getElementById('battleArmySelect'); if(!sel)return;
+ const names=Object.keys(state.armies);
+ if(!names.includes(selectedArmyForBattle)) selectedArmyForBattle=names[0]||'1. Ordu';
+ sel.innerHTML=names.map(n=>`<option value="${n}" ${n===selectedArmyForBattle?'selected':''}>${n}</option>`).join('');
+ sel.onchange=()=>selectedArmyForBattle=sel.value;
+ const ticker=document.getElementById('battleTicker');
+ const active=state.wars.find(w=>w.status==='active');
+ ticker.textContent=active?`⚔️ ${active.enemy} • Cephe %${active.front} • 🛢️ ${fmt(state.oil)}`:'🟢 Savaş bekleniyor';
+ renderTacticalUnits();
+ const line=document.querySelector('.front-line'); if(line)line.style.left=Math.max(22,Math.min(76,22+frontProgress*.54))+'%';
+}
+function moveSelectedArmy(){
+ const a=state.armies[selectedArmyForBattle]; if(!a)return toast('Ordu bulunamadı.');
+ frontProgress=Math.min(100,frontProgress+5);
+ const marker=document.querySelector('.u1'); if(selectedArmyForBattle!=='1. Ordu')document.querySelector('.u2').style.left=Math.min(65,parseFloat(document.querySelector('.u2').style.left||38)+5)+'%';
+ else marker.style.left=Math.min(65,parseFloat(marker.style.left||29)+5)+'%';
+ document.getElementById('battleTicker').textContent=`📍 ${selectedArmyForBattle} cephede ilerledi.`;
+}
+function attackFront(){
+ const activeIndex=state.wars.findIndex(w=>w.status==='active');
+ if(activeIndex<0)return toast('Önce Savaş Merkezi bölümünden bir rakibe savaş ilan et.');
+ battle(activeIndex);
+ frontProgress=state.wars[activeIndex].front;
+ renderBattleMap();
+}
+
+function upgradeFactory(id){
+ const f=state.factories[id]; if(!f)return;
+ const cost=Math.round(f.cost*Math.pow(1.55,f.level-1));
+ if(state.money<cost)return toast(`Yükseltme için ${fmt(cost)} 💰 gerekiyor.`);
+ state.money-=cost;f.level++;f.bonus++;
+ toast(`🏭 ${f.name} seviye ${f.level} oldu.`);
+ update();
+}
+function renderStrategicCities(){
+ const box=document.getElementById('strategicCities');if(!box)return;box.innerHTML='';
+ Object.entries(state.cities).forEach(([id,c])=>{
+  const army=Object.entries(state.armies).find(([n,a])=>a.city===id);
+  const strategic=id==='eastoil'||id==='desert'?'🛢️ Petrol':id==='northport'?'⚓ Liman':c.industry>70?'🏭 Sanayi':'🏙️ Şehir';
+  const income=Math.round(c.industry*12+c.population/5000);
+  box.innerHTML+=`<div class="card"><h3>${strategic} ${c.name}</h3>
+   <div class="small muted">👥 ${fmt(c.population)} nüfus</div>
+   <div class="statline"><span>🏭 Sanayi</span><b>${c.industry}</b></div><div class="progress"><i style="width:${c.industry}%"></i></div>
+   <div class="statline"><span>🛡️ Savunma</span><b>${c.defense}</b></div><div class="progress"><i style="width:${c.defense}%"></i></div>
+   <div class="small">💰 Tahmini gelir: <b>${fmt(income)}/dk</b></div>
+   <div class="small muted">⚔️ ${army?army[0]:'Ordu yok'}</div>
+   <div class="actions"><button class="btn primary" onclick="openDeploy('${id}')">🪖 Birlik</button><button class="btn" onclick="fortifyCity('${id}')">🛡️ Tahkim Et</button></div>
+  </div>`;
+ });
+}
+function fortifyCity(id){
+ const c=state.cities[id],cost=5000+c.defense*120;
+ if(state.money<cost)return toast(`Tahkimat için ${fmt(cost)} 💰 gerekiyor.`);
+ state.money-=cost;c.defense=Math.min(100,c.defense+8);toast(`🛡️ ${c.name} savunması güçlendirildi.`);update();
+}
+function renderFactories(){
+ const box=document.getElementById('factories');if(!box)return;box.innerHTML='';
+ Object.entries(state.factories).forEach(([id,f])=>{
+  const cost=Math.round(f.cost*Math.pow(1.55,f.level-1));
+  box.innerHTML+=`<div class="card"><h3>🏭 ${f.name}</h3><div class="big">Lv.${f.level}</div>
+  <p class="small muted">Üretim kapasitesi +${f.bonus} • Tür: ${f.kind}</p>
+  <button class="btn primary" onclick="upgradeFactory('${id}')">⬆️ Geliştir • ${fmt(cost)} 💰</button></div>`;
+ });
+}
+function renderUnitStats(){
+ const box=document.getElementById('unitStats');if(!box)return;box.innerHTML='';
+ Object.entries(units).forEach(([id,u])=>{
+  box.innerHTML+=`<div class="card"><h3>${u.emoji} ${u.name}</h3><div class="small">Tür: <b>${u.type}</b></div>
+   <div class="small">⚔️ Güç <b>${fmt(u.power)}</b> • ⏱️ ${u.time}s</div>
+   <div class="small">💰 ${fmt(u.cost)} • 🛢️ ${fmt(u.oil||0)}</div></div>`;
+ });
+}
+
+function captureCity(cityId){
+ const c=state.cities[cityId];if(!c)return;
+ c.defense=20;
+ state.money+=Math.round(c.population/100);
+ state.power+=25;
+ toast(`🏙️ ${c.name} ele geçirildi! Ekonomine bağlandı.`);
+ update();
+}
+function renderWars(){
+ const stats=document.getElementById('warStats');
+ const active=state.wars.filter(w=>w.status==='active').length;
+ stats.innerHTML=`<div class="card"><h3>⚔️ Ordu Gücü</h3><div class="big red">${fmt(myArmyPower())}</div></div>
+ <div class="card"><h3>🔥 Aktif Cephe</h3><div class="big">${active}</div></div>
+ <div class="card"><h3>🏆 Zafer Geçmişi</h3><div class="big">${state.warLog.filter(x=>x.includes('zafer')).length}</div></div>`;
+ const wb=document.getElementById('wars');
+ const activeWars=state.wars;
+ wb.innerHTML=activeWars.length?activeWars.map((w,i)=>{
+   const status=w.status==='active'?'🟢 AKTİF':w.status==='victory'?'🏆 ZAFER':'💀 MAĞLUBİYET';
+   return `<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><h3>${status} • ${w.enemy}</h3><span class="small muted">Tur ${w.turn}</span></div>
+   <div class="small">🪖 Sen: <b>${fmt(myArmyPower())}</b> ⚔️ Düşman: <b>${fmt(w.enemyPower)}</b></div>
+   <div class="small" style="margin-top:8px">Cephe ilerlemesi: <b>%${w.front}</b> • Düşman şehirleri: <b>${w.enemyCities}</b></div>
+   <div class="progress"><i style="width:${w.front}%"></i></div>
+   <div class="small muted" style="margin-top:8px">Kayıpların: ${fmt(w.lost)} • Düşman kaybı: ${fmt(w.won)}</div>
+   ${w.status==='active'?`<div class="actions"><button class="btn danger" onclick="battle(${i})">⚔️ Saldırı Yap • 500 🛢️</button></div>`:''}</div>`;
+ }).join(''):'<div class="card"><div class="muted">Aktif savaş yok.</div></div>';
+ document.getElementById('enemies').innerHTML=enemies.map(e=>`<div class="card"><div style="font-size:30px">${e.flag}</div><h3>${e.name}</h3><p class="small muted">Başkent: ${e.capital}<br>👥 ${fmt(e.pop)} • 🏙️ ${e.cities} şehir<br>⚔️ Güç ${fmt(e.power)} • İlişki ${e.relation}/100</p><button class="btn danger" onclick="declareWar('${e.id}')">📜 Savaş İlan Et • 10K 💰</button></div>`).join('');
+}
+
+function upgradeIndustry(){if(state.money<15000)return toast('Yetersiz para.');state.money-=15000;state.industry+=20;toast('Sanayi kapasitesi +20');update()}
+function buyOilMachine(){if(state.money<8000)return toast('Yetersiz para.');state.money-=8000;state.oilMachines++;toast('Petrol makinesi satın alındı.');update()}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+b.dataset.view))}));
+
+/* Harita: sürükleme + yakınlaştırma + bölgeler/şehirler */
+const canvas=document.getElementById('map'),ctx=canvas.getContext('2d'),wrap=document.getElementById('mapwrap');
+let scale=1,ox=0,oy=0,drag=false,lastX=0,lastY=0;
+const regions=[
+ {id:'capital',name:'Başkent Bölgesi',x:1060,y:650,type:'city',emoji:'🏛️',income:900,oil:0,pop:8500,desc:'Devletin yönetim merkezi.'},
+ {id:'west',name:'Batı Sanayi Havzası',x:620,y:570,type:'industry',emoji:'🏭',income:1400,oil:0,pop:5200,desc:'Sanayi üretimi güçlü bölge.'},
+ {id:'eastoil',name:'Doğu Petrol Sahası',x:1530,y:620,type:'oil',emoji:'🛢️',income:500,oil:650,pop:1800,desc:'Zengin petrol rezervleri.'},
+ {id:'northport',name:'Kuzey Limanı',x:1160,y:300,type:'port',emoji:'⚓',income:800,oil:0,pop:2400,desc:'Deniz ticareti ve donanma üssü.'},
+ {id:'southcity',name:'Güney Şehri',x:1040,y:1040,type:'city',emoji:'🏙️',income:700,oil:0,pop:4100,desc:'Büyüyen ticaret şehri.'},
+ {id:'mine',name:'Merkez Maden Bölgesi',x:420,y:880,type:'mine',emoji:'⛏️',income:1100,oil:0,pop:1700,desc:'Metal ve maden üretimi.'},
+ {id:'desert',name:'Güney Petrol Havzası',x:1610,y:1000,type:'oil',emoji:'🛢️',income:450,oil:500,pop:1100,desc:'Yeni keşfedilen petrol sahası.'}
+];
+function drawMap(){
+ ctx.clearRect(0,0,2200,1400);
+ const g=ctx.createLinearGradient(0,0,0,1400);g.addColorStop(0,'#0c2535');g.addColorStop(.5,'#0a1e2a');g.addColorStop(1,'#071722');ctx.fillStyle=g;ctx.fillRect(0,0,2200,1400);
+ // sea lines
+ ctx.strokeStyle='rgba(55,120,155,.22)';ctx.lineWidth=2;
+ for(let y=80;y<1400;y+=70){ctx.beginPath();for(let x=0;x<=2200;x+=40)ctx.lineTo(x,y+Math.sin(x*.02+y)*6);ctx.stroke()}
+ // large land mass
+ ctx.fillStyle='#183c31';ctx.strokeStyle='#315c49';ctx.lineWidth=7;
+ ctx.beginPath();ctx.moveTo(180,380);ctx.quadraticCurveTo(420,190,720,260);ctx.quadraticCurveTo(930,120,1180,250);ctx.quadraticCurveTo(1510,120,1880,390);ctx.quadraticCurveTo(2030,620,1870,820);ctx.quadraticCurveTo(1940,1080,1640,1190);ctx.quadraticCurveTo(1320,1270,1050,1160);ctx.quadraticCurveTo(760,1260,480,1110);ctx.quadraticCurveTo(190,1030,250,780);ctx.quadraticCurveTo(80,580,180,380);ctx.closePath();ctx.fill();ctx.stroke();
+ // region borders
+ const borders=[
+  [350,500,720,260,920,620],[720,260,1180,250,1060,650],[1180,250,1510,300,1530,620],
+  [1060,650,1530,620,1640,1190],[420,880,1060,650,1040,1040],[250,780,420,880,480,1110]
+ ];
+ ctx.strokeStyle='#376b55';ctx.lineWidth=4;
+ borders.forEach(b=>{ctx.beginPath();ctx.moveTo(b[0],b[1]);ctx.quadraticCurveTo(b[2],b[3],b[4],b[5]);ctx.stroke()});
+ // roads
+ ctx.strokeStyle='rgba(207,181,115,.35)';ctx.lineWidth=3;ctx.setLineDash([12,10]);
+ ctx.beginPath();ctx.moveTo(420,880);ctx.lineTo(1060,650);ctx.lineTo(1530,620);ctx.lineTo(1610,1000);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(1060,650);ctx.lineTo(1160,300);ctx.stroke();ctx.setLineDash([]);
+ // title
+ ctx.fillStyle='rgba(255,255,255,.055)';ctx.font='900 82px system-ui';ctx.fillText('DEVLETLER ÇAĞI',760,125);
+ // region points
+ regions.forEach(r=>{
+   ctx.beginPath();ctx.fillStyle=r.type==='oil'?'#d7a52e':r.type==='industry'?'#6e9fc9':r.type==='port'?'#62b6d7':r.type==='mine'?'#a88c6a':'#e0bd61';
+   ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=18;ctx.arc(r.x,r.y,r.type==='city'?17:14,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+   ctx.fillStyle='#fff';ctx.font='22px system-ui';ctx.fillText(r.emoji,r.x-11,r.y+7);
+   ctx.font='700 15px system-ui';ctx.fillText(r.name,r.x+24,r.y+5);
+ });
+}
+function applyMap(){canvas.style.transform=`translate(calc(-50% + ${ox}px),calc(-50% + ${oy}px)) scale(${scale})`}
+function pointerStart(e){drag=true;lastX=e.clientX;lastY=e.clientY}
+function pointerMove(e){if(!drag)return;ox+=e.clientX-lastX;oy+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;applyMap()}
+function pointerEnd(){drag=false}
+wrap.addEventListener('pointerdown',pointerStart);wrap.addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerEnd);
+document.getElementById('zoomIn').onclick=()=>{scale=Math.min(2.2,scale+.15);applyMap()};document.getElementById('zoomOut').onclick=()=>{scale=Math.max(.55,scale-.15);applyMap()};document.getElementById('centerMap').onclick=()=>{scale=1;ox=oy=0;applyMap()};
+let touchDist=0;
+wrap.addEventListener('touchmove',e=>{if(e.touches.length===2){e.preventDefault();const a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(touchDist){scale=Math.max(.55,Math.min(2.2,scale+(d-touchDist)*.003));applyMap()}touchDist=d}},{passive:false});
+wrap.addEventListener('touchend',()=>touchDist=0);
+canvas.addEventListener('click',e=>{
+ const rect=canvas.getBoundingClientRect();
+ const x=(e.clientX-rect.left)*(2200/rect.width),y=(e.clientY-rect.top)*(1400/rect.height);
+ let hit=regions.find(r=>Math.hypot(r.x-x,r.y-y)<34);
+ if(hit){
+   document.getElementById('modalContent').innerHTML=`<h1>${hit.emoji} ${hit.name}</h1><div class="sub">${hit.desc}</div>
+   <div class="grid3"><div class="card"><h3>👥 Nüfus</h3><div class="big">${fmt(hit.pop)}</div></div><div class="card"><h3>💰 Gelir</h3><div class="big gold">+${fmt(hit.income)}/dk</div></div><div class="card"><h3>🛢️ Petrol</h3><div class="big blue">+${fmt(hit.oil)}/dk</div></div></div>
+   <div class="actions"><button class="btn primary" onclick="claimRegion('${hit.id}')">Bölgeyi Yönet</button><button class="btn" onclick="closeModal()">Kapat</button></div>`;
+   document.getElementById('modal').classList.add('show');
+ }
+});
+function claimRegion(id){toast('Bölge yönetimi aktif edildi. Gelir üretime eklendi.');closeModal()}
+load();drawMap();applyMap();update();
+setInterval(()=>{
+ state.population+=125;
+ state.money+=350+state.industry*2+600;
+ state.oil+=80+state.oilMachines*40+110;
+ state.production.forEach(p=>p.remaining--);
+ const done=state.production.filter(p=>p.remaining<=0);state.production=state.production.filter(p=>p.remaining>0);
+ done.forEach(p=>{state.inventory[p.id]=(state.inventory[p.id]||0)+1;state.power+=units[p.id].power;toast(`${units[p.id].name} hazır! Envantere +1`)});
+ update();
+},1000);
+</script>
+</body>
+</html>
